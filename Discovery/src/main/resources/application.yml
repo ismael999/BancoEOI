@@ -1,0 +1,29 @@
+server:
+  port: 8761  
+spring:
+  boot:
+    admin:
+      context-path: /admin  
+  main:
+    allow-bean-definition-overriding: true   
+eureka:
+  client:
+    registryFetchIntervalSeconds: 5
+    registerWithEureka: false
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${DISCOVERY_HOST:localhost}:${DISCOVERY_PORT:8761}/eureka/
+  instance:
+    hostname: admin
+    prefer-ip-address: true
+ribbon:
+  http:
+    client:
+      enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,actuator,metrics
+   
+        

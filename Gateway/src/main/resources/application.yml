@@ -1,0 +1,25 @@
+server:
+  port:  8080     
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://${DISCOVERY_HOST:localhost}:${DISCOVERY_PORT:8761}/eureka/
+  instance:
+    hostname: gateway
+    prefer-ip-address: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,metrics,health,routes 
+spring:
+  application:
+    name: gateway
+zuul:
+  ignored-services: discovery, config, gateway
+  sensitiveHeaders:
+  host:
+    connect-timeout-millis: 20000
+    socket-timeout-millis: 20000
