@@ -21,7 +21,7 @@ import es.eoi.mundobancariofront.view.MainMenu;
 
 public class ClienteController {
 
-	private final String URL = "http://localhost:8080/clientes";
+	private final String URL = "http://localhost:8080/micro-cliente/clientes";
 	
 	public void clienteMenuController(Integer option) {
 		switch (option) {

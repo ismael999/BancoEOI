@@ -30,11 +30,6 @@ public class MovimientoServiceImpl implements MovimientoService {
 	private ModelMapper modelMapper;
 	
 	@Override
-	public List<MovimientoDto> findById(Integer id) {
-		return null;
-	}
-
-	@Override
 	public List<MovimientoDto> findByCuenta(CuentaDto cuenta) {
 		List<Movimiento> movimiento = repository.findByCuenta(modelMapper.map(cuenta, Cuenta.class));
 		

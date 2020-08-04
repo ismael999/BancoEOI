@@ -19,8 +19,6 @@ public interface MovimientoService {
 	
 	public void createMovimiento(Prestamo prestamo, Cuenta cuenta);
 	
-	public List<MovimientoDto> findById(Integer id);
-	
 	public List<MovimientoDto> findByCuenta(CuentaDto cuenta);
 	
 	public void createMovimientos(List<Movimiento> movimientos);

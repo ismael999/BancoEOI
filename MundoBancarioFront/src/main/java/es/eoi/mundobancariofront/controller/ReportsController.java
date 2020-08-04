@@ -19,7 +19,7 @@ import es.eoi.mundobancariofront.view.ReportsView;
 
 public class ReportsController {
 
-	private final String URL = "http://localhost:8080/reports";
+	private final String URL = "http://localhost:8080/micro-report/reports";
 
 	
 	public void menuController(Integer option) {

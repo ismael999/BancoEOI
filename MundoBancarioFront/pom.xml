@@ -30,7 +30,7 @@
 		</dependency>
 		<dependency>
 			<groupId>es.eoi.mundobancario</groupId>
-			<artifactId>MundoBancario</artifactId>
+			<artifactId>CommonEntities</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

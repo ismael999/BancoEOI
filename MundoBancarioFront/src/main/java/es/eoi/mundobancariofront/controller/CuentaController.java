@@ -21,7 +21,7 @@ import es.eoi.mundobancariofront.MundoBancarioFrontApplication;
 
 public class CuentaController {
 
-	private final String URL = "http://localhost:8080/cuentas";
+	private final String URL = "http://localhost:8080/micro-cuenta/cuentas";
 	
 	public List<CuentaDto> getAllCuentas(){
 		try {
