@@ -3,6 +3,8 @@ package es.eoi.mundobancario.serviceInterfaces;
 import java.io.IOException;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import es.eoi.mundobancario.dto.ClienteDto;
 import es.eoi.mundobancario.dto.ReportsClienteDto;
 
@@ -20,6 +22,6 @@ public interface ClienteService {
 	
 	public void create(ClienteDto cliente);
 	
-	public void findByIdReportPDF(Integer id) throws IOException;
+	public void findByIdReportPDF(Integer id) throws IOException, MessagingException;
 	
 }

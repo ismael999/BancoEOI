@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -48,7 +49,9 @@ public class PrestamoServiceImpl implements PrestamoService {
 	private PrestamoRepository repository;
 	@Autowired
 	private ModelMapper modelMapper;
-	
+	@Autowired
+	private EmailManager email;
+
 	private final String DEST = "./src/main/resources/EOI_BANK_PRESTAMO_";
 
 	@Override
@@ -72,13 +75,13 @@ public class PrestamoServiceImpl implements PrestamoService {
 
 	@Override
 	@Transactional(rollbackOn = Exception.class)
-	public Prestamo createPrestamo(CreatePrestamoForm dto, Cuenta cuenta) throws PrestamoActivoException{
+	public Prestamo createPrestamo(CreatePrestamoForm dto, Cuenta cuenta) throws PrestamoActivoException {
 		for (Prestamo prestamo : cuenta.getPrestamos()) {
-			if(!prestamo.isPagado()) {
+			if (!prestamo.isPagado()) {
 				throw new PrestamoActivoException("No puedes crear un prestamo si tienes uno activo.");
 			}
 		}
-		
+
 		Prestamo prestamo = modelMapper.map(dto, Prestamo.class);
 		prestamo.setFecha(Calendar.getInstance().getTime());
 		prestamo.setCuenta(cuenta);
@@ -102,117 +105,113 @@ public class PrestamoServiceImpl implements PrestamoService {
 		dto.setCliente(modelMapper.map(prestamo.getCuenta().getCliente(), ClienteDto.class));
 
 		return dto;
-		
+
 	}
 
 	@Override
 	public List<ReportsListPrestamoDto> getAllPrestamosVivosReports() {
 		List<Prestamo> prestamos = repository.findByPagado(false);
-		List<ReportsListPrestamoDto> dtos = prestamos
-				.stream()
-				.map(p -> {
-					ReportsListPrestamoDto dto = modelMapper.map(p, ReportsListPrestamoDto.class);
-					dto.setCliente(modelMapper.map(p.getCuenta().getCliente(), ClienteDto.class));
-					dto.getCliente().setPass("*******");
-					dto.setCuenta(modelMapper.map(p.getCuenta(), ReportsCuentaListDto.class));
-					return dto;
-				})
-				.collect(Collectors.toList());
+		List<ReportsListPrestamoDto> dtos = prestamos.stream().map(p -> {
+			ReportsListPrestamoDto dto = modelMapper.map(p, ReportsListPrestamoDto.class);
+			dto.setCliente(modelMapper.map(p.getCuenta().getCliente(), ClienteDto.class));
+			dto.getCliente().setPass("*******");
+			dto.setCuenta(modelMapper.map(p.getCuenta(), ReportsCuentaListDto.class));
+			return dto;
+		}).collect(Collectors.toList());
 		return dtos;
 	}
 
 	@Override
 	public List<ReportsListPrestamoDto> getAllPrestamosAmortizadosReports() {
 		List<Prestamo> prestamos = repository.findByPagado(true);
-		List<ReportsListPrestamoDto> dtos = prestamos
-				.stream()
-				.map(p -> {
-					ReportsListPrestamoDto dto = modelMapper.map(p, ReportsListPrestamoDto.class);
-					dto.setCliente(modelMapper.map(p.getCuenta().getCliente(), ClienteDto.class));
-					dto.getCliente().setPass("*******");
-					dto.setCuenta(modelMapper.map(p.getCuenta(), ReportsCuentaListDto.class));
-					return dto;
-				})
-				.collect(Collectors.toList());
+		List<ReportsListPrestamoDto> dtos = prestamos.stream().map(p -> {
+			ReportsListPrestamoDto dto = modelMapper.map(p, ReportsListPrestamoDto.class);
+			dto.setCliente(modelMapper.map(p.getCuenta().getCliente(), ClienteDto.class));
+			dto.getCliente().setPass("*******");
+			dto.setCuenta(modelMapper.map(p.getCuenta(), ReportsCuentaListDto.class));
+			return dto;
+		}).collect(Collectors.toList());
 		return dtos;
 	}
 
 	@Override
-	public void findByIdReportPDF(Integer id) throws IOException {
+	public void findByIdReportPDF(Integer id) throws IOException, MessagingException {
 		Locale locale = new Locale("es", "ES");
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 		Prestamo prestamo = repository.findById(id).get();
 		Cliente cliente = prestamo.getCuenta().getCliente();
-		
-		PdfWriter writer = new PdfWriter(DEST.concat(cliente.getUsuario()+prestamo.getId()+".pdf"));
+
+		PdfWriter writer = new PdfWriter(DEST.concat(cliente.getUsuario() + prestamo.getId() + ".pdf"));
 		PdfDocument pdf = new PdfDocument(writer);
 		Document document = new Document(pdf, PageSize.A4.rotate());
 		document.setMargins(20, 20, 20, 20);
-		
+
 		// Funtes
 		PdfFont titulo = PdfFontFactory.createFont(FontConstants.TIMES_BOLD);
 		PdfFont subTitulo = PdfFontFactory.createFont(FontConstants.TIMES_BOLDITALIC);
-		
+
 		// Tabla con los datos del cliente
-		Table datosCliente = new Table(new float[] {1F, 1F}).setMargin(20);
+		Table datosCliente = new Table(new float[] { 1F, 1F }).setMargin(20);
 		datosCliente.addCell(new Cell().add("Nombre: ").setBorder(Border.NO_BORDER));
 		datosCliente.addCell(new Cell().add(cliente.getNombre()).setBorder(Border.NO_BORDER));
-		
+
 		datosCliente.addCell(new Cell().add("Usuario: ").setBorder(Border.NO_BORDER));
 		datosCliente.addCell(new Cell().add(cliente.getUsuario()).setBorder(Border.NO_BORDER));
-		
+
 		datosCliente.addCell(new Cell().add("Email: ").setBorder(Border.NO_BORDER));
 		datosCliente.addCell(new Cell().add(cliente.getEmail()).setBorder(Border.NO_BORDER));
-		
+
 		// Titulo del documento
 		document.add(new Paragraph("EOI BANK").setFont(titulo).setFontSize(30));
-		document.add(new Paragraph("Prestamos").setFont(subTitulo).setFontSize(20).setFontColor(Color.GRAY).setMarginTop(-15));
+		document.add(new Paragraph("Prestamos").setFont(subTitulo).setFontSize(20).setFontColor(Color.GRAY)
+				.setMarginTop(-15));
 		document.add(datosCliente);
-		
+
 		// Datos del prestamo
 		document.add(new Paragraph("Datos del prestamo").setFont(subTitulo).setFontSize(20));
-		
-		Table datosPrestamo = new Table(new float[] {1F, 1F});
+
+		Table datosPrestamo = new Table(new float[] { 1F, 1F });
 		datosPrestamo.addCell(new Cell().add("Descripción: ").setBorder(Border.NO_BORDER));
 		datosPrestamo.addCell(new Cell().add(prestamo.getDescripcion()).setBorder(Border.NO_BORDER));
-		
+
 		datosPrestamo.addCell(new Cell().add("Fecha: ").setBorder(Border.NO_BORDER));
 		datosPrestamo.addCell(new Cell().add(dateFormat.format(prestamo.getFecha())).setBorder(Border.NO_BORDER));
-		
+
 		datosPrestamo.addCell(new Cell().add("Importe: ").setBorder(Border.NO_BORDER));
 		datosPrestamo.addCell(new Cell().add(String.valueOf(prestamo.getImporte())).setBorder(Border.NO_BORDER));
-		
+
 		datosPrestamo.addCell(new Cell().add("Pagado: ").setBorder(Border.NO_BORDER));
-		if(prestamo.isPagado()) {
+		if (prestamo.isPagado()) {
 			datosPrestamo.addCell(new Cell().add("Si").setBorder(Border.NO_BORDER));
-		}else {
+		} else {
 			datosPrestamo.addCell(new Cell().add("No").setBorder(Border.NO_BORDER));
 		}
-		
+
 		datosPrestamo.addCell(new Cell().add("Plazos: ").setBorder(Border.NO_BORDER));
 		datosPrestamo.addCell(new Cell().add(String.valueOf(prestamo.getPlazos())).setBorder(Border.NO_BORDER));
-		
+
 		// Datos de las amortizaciones
 		for (int i = 0; i < prestamo.getAmortizaciones().size(); i++) {
 			Amortizacion amortizacion = prestamo.getAmortizaciones().get(i);
-			
-			Table table = new Table(new float[] {1F, 1F, 1F});
+
+			Table table = new Table(new float[] { 1F, 1F, 1F });
 			table.setWidthPercent(100);
 			table.addCell(new Cell().add("Fecha"));
 			table.addCell(new Cell().add("Importe"));
 			table.addCell(new Cell().add("Pagado"));
-			
+
 			table.addCell(new Cell().add(dateFormat.format(amortizacion.getFecha())));
 			table.addCell(new Cell().add(String.valueOf(amortizacion.getImporte())));
-			if(amortizacion.isPagado()) {
+			if (amortizacion.isPagado()) {
 				table.addCell(new Cell().add("Si"));
-			}else {
+			} else {
 				table.addCell(new Cell().add("No"));
 			}
-			
+
 			document.add(table);
 		}
-		
+
 		document.close();
+		email.sendMail(cliente.getEmail(), "Datos de Prestamo", "Datos del Prestamo: " + prestamo.getId() , DEST, cliente.getUsuario() + prestamo.getId() + ".pdf");
 	}
 }

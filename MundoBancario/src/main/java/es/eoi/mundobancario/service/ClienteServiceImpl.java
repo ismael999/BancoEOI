@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -40,6 +41,8 @@ public class ClienteServiceImpl implements ClienteService {
 	private ClienteRepository repository;
 	@Autowired
 	private ModelMapper modelMapper;
+	@Autowired
+	private EmailManager email;
 	
 	private final String DEST = "./src/main/resources/EOI_BANK_CLIENTE_";
 
@@ -89,7 +92,7 @@ public class ClienteServiceImpl implements ClienteService {
 	}
 
 	@Override
-	public void findByIdReportPDF(Integer id) throws IOException {
+	public void findByIdReportPDF(Integer id) throws IOException, MessagingException {
 		Locale locale = new Locale("es", "ES");
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 		ReportsClienteDto cliente = modelMapper.map(repository.findById(id).get(), ReportsClienteDto.class);
@@ -155,6 +158,7 @@ public class ClienteServiceImpl implements ClienteService {
 			
 		}
 		document.close();
+		email.sendMail(cliente.getEmail(), "Datos de Cliente", "Datos de cliente: " + cliente.getUsuario() , DEST, cliente.getUsuario()+".pdf");
 	}
 
 }

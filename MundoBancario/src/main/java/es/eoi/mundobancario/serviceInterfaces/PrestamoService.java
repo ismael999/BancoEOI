@@ -3,6 +3,8 @@ package es.eoi.mundobancario.serviceInterfaces;
 import java.io.IOException;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import es.eoi.mundobancario.dto.CuentaDto;
 import es.eoi.mundobancario.dto.PrestamoDto;
 import es.eoi.mundobancario.dto.ReportsListPrestamoDto;
@@ -18,7 +20,7 @@ public interface PrestamoService {
 	
 	public ReportsPrestamosDto findByIdReport(Integer id);
 	
-	public void findByIdReportPDF(Integer id) throws IOException;
+	public void findByIdReportPDF(Integer id) throws IOException, MessagingException;
 	
 	public List<PrestamoDto> getPrestamosVivos(CuentaDto cuenta);
 	
