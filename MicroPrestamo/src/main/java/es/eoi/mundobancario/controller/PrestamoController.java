@@ -111,9 +111,10 @@ public class PrestamoController implements PrestamoInterfaceFeign{
 	@PostMapping("/reports/prestamos/{id}")
 	public ResponseEntity<String> findByIdReportPDF(@PathVariable Integer id){
 		try {
-			service.findByIdReport(id);
+			service.findByIdReportPDF(id);
 			return new ResponseEntity<String>(HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 	}

@@ -73,7 +73,7 @@ public class ReportsController {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.exchange(URL.concat("/clientes/"+MundoBancarioFrontApplication.user.getId()),HttpMethod.POST, form, String.class);
 		} catch (Exception e) {
-			System.out.println("Error al crear el PDF.");
+			System.out.println("-");
 		}
 	}
 	
@@ -98,7 +98,7 @@ public class ReportsController {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.exchange(URL.concat("/prestamos/"+id),HttpMethod.POST, form, String.class);
 		} catch (Exception e) {
-			System.out.println("Error al crear el PDF.");
+			System.out.println("-");
 		}
 	}
 	

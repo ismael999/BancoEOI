@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -47,6 +48,8 @@ public class PrestamoServiceImpl implements PrestamoService {
 	private PrestamoRepository repository;
 	@Autowired
 	private ModelMapper modelMapper;
+	@Autowired
+	private EmailManager email;
 
 	private final String DEST = "./src/main/resources/EOI_BANK_PRESTAMO_";
 
@@ -132,7 +135,7 @@ public class PrestamoServiceImpl implements PrestamoService {
 	}
 
 	@Override
-	public void findByIdReportPDF(Integer id) throws IOException {
+	public void findByIdReportPDF(Integer id) throws IOException, MessagingException {
 		Locale locale = new Locale("es", "ES");
 		DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
 		Prestamo prestamo = repository.findById(id).get();
@@ -209,5 +212,6 @@ public class PrestamoServiceImpl implements PrestamoService {
 		}
 
 		document.close();
+		email.sendMail(cliente.getEmail(), "Datos de Prestamo", "Datos del Prestamo: " + prestamo.getId() , DEST, cliente.getUsuario() + prestamo.getId() + ".pdf");
 	}
 }

@@ -103,6 +103,7 @@ public class ClientesController implements ClienteInterfaceFeign{
 			service.findByIdReportPDF(id);
 			return new ResponseEntity<String>(HttpStatus.CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}
 	}
