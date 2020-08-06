@@ -15,6 +15,7 @@ import es.eoi.mundobancario.dto.CuentaDto;
 import es.eoi.mundobancario.form.Login;
 import es.eoi.mundobancario.form.UpdateClienteForm;
 import es.eoi.mundobancariofront.MundoBancarioFrontApplication;
+import es.eoi.mundobancariofront.view.AccountView;
 import es.eoi.mundobancariofront.view.ClienteView;
 import es.eoi.mundobancariofront.view.CuentaView;
 import es.eoi.mundobancariofront.view.MainMenu;
@@ -31,6 +32,7 @@ public class ClienteController {
 			break;
 		case 2:
 			ClienteView.updateEmail();
+			AccountView.login();
 			ClienteView.clienteMenu();
 			break;
 		case 3:
@@ -130,7 +132,7 @@ public class ClienteController {
 		}
 	}
 	
-	public void findByIf() {
+	public void findById() {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			ResponseEntity<ClienteDto> response = restTemplate.getForEntity(URL.concat("/"+MundoBancarioFrontApplication.user.getId()), ClienteDto.class);
@@ -148,7 +150,6 @@ public class ClienteController {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<UpdateClienteForm> form = new HttpEntity<>(emailForm, headers);
-		
 		
 		try {
 			RestTemplate restTemplate = new RestTemplate();

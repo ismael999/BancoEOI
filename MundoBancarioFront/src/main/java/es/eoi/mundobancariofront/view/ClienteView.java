@@ -48,6 +48,7 @@ public class ClienteView {
 			updateEmail();
 		}
 		
+		System.out.println(">	Es necesario volver a inicar sesión.");
 		controller.updateEmail(email);
 	}
 	
